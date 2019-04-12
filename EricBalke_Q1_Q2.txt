@@ -435,4 +435,3 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
 run; 
 title;
 ods graphics off;
-ods graphics off;
