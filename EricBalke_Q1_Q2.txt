@@ -264,7 +264,7 @@ where Neighborhood in ("NAmes","Edwards","BrkSide");
 run;
 
 /* Create dummy variables for the Neighborhoods */
-data train_2 (Keep = Id Neighborhood SalePrice GrLIvArea N_Dummy E_Dummy int_e int_n);
+data train_2;
 set train_1;
 
 N_Dummy = 0; E_Dummy = 0;
@@ -377,3 +377,62 @@ quit;
 title;
 ods graphics off;
 
+/*****************/
+/* Start Q2 Here */
+/*****************/
+data train_6;
+set train;
+
+SalePrice_l = log(SalePrice);
+GrLIvArea_l = log(GrLIvArea);
+
+run;
+
+ods graphics on;
+title "Stepwise Multiple Linear Regression";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+|GarageCars @2 / selection = stepwise(choose = cv select = sl)  
+                stats     = press 
+                cvMethod  = split(5) 
+                cvDetails = all 
+                hierarchy = single;
+       output out=outData;
+run; 
+title;
+ods graphics off;
+
+ods graphics on;
+title "Forward Selection Multiple Linear Regression";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+|GarageCars @2 / selection = forward(choose = cv select = sl)  
+                stats     = press 
+                cvMethod  = split(5) 
+                cvDetails = all 
+                hierarchy = single;
+       output out=outData;
+run; 
+title;
+ods graphics off;
+
+ods graphics on;
+title "Backward Selection Multiple Linear Regression";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+|GarageCars @2 / selection = backward(choose = cv select = sl)  
+                stats     = press 
+                cvMethod  = split(5) 
+                cvDetails = all 
+                hierarchy = single;
+       output out=outData;
+run; 
+title;
+ods graphics off;
+ods graphics off;
