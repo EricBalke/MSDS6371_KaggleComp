@@ -255,7 +255,7 @@ run;
 proc print data = train (obs = 10);
 run;
 
-
+/* Limit to the three neighborhoods */
 data train_1;
 set train;
 
@@ -263,6 +263,7 @@ where Neighborhood in ("NAmes","Edwards","BrkSide");
 
 run;
 
+/* Create dummy variables for the Neighborhoods */
 data train_2 (Keep = Id Neighborhood SalePrice GrLIvArea N_Dummy E_Dummy int_e int_n);
 set train_1;
 
