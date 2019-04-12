@@ -276,9 +276,6 @@ int_n = N_Dummy * GrLIvArea;
 
 run;
 
-proc univariate data = train_2;
-run;
-
 title "Scatterplot of original data";
 proc sgplot data = train_2;
 scatter x = GrLIvArea y = SalePrice / datalabel = Id markerattrs=(symbol=CircleFilled) group= Neighborhood;
@@ -390,7 +387,7 @@ run;
 
 ods graphics on;
 title "Stepwise Multiple Linear Regression";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_sel;
 	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
 			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
@@ -399,14 +396,20 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData;
+       output out=outData_Step;
 run; 
+
+proc reg data = step_sel plots = all;
+	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	ID id;
+run;
+
 title;
 ods graphics off;
 
 ods graphics on;
 title "Forward Selection Multiple Linear Regression";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = forw_sel;
 	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
 			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
@@ -415,14 +418,20 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData;
+       output out=outData_Forw;
 run; 
+
+proc reg data = forw_sel plots = all;
+	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	ID id;
+run;
+
 title;
 ods graphics off;
 
 ods graphics on;
 title "Backward Selection Multiple Linear Regression";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = back_sel;
 	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
 			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
@@ -431,7 +440,13 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot);
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData;
+       output out=outData_Back;
 run; 
+
+proc reg data = back_sel plots = all;
+	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	ID id;
+run;
+
 title;
 ods graphics off;
