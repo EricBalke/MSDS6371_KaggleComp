@@ -681,7 +681,7 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outd
 		cvMethod  = split(5) 
 		cvDetails = all 
 		hierarchy = single;
-	output out=outData_forw_allvars predicted = forw_allvars_step_l;
+	output out=outData_forw_allvars predicted = pred_forw_allvars_l;
 run; 
 
 proc reg data = forw_allvars_sel plots = all;
