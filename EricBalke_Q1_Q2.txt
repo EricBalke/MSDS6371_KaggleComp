@@ -62,7 +62,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSO
     informat Fireplaces best32. ;
     informat FireplaceQu $2. ;
     informat GarageType $7. ;
-    informat GarageYrBlt $4. ;
+    informat GarageYrBlt best32. ;
     informat GarageFinish $3. ;
     informat GarageCars best32. ;
     informat GarageArea best32. ;
@@ -143,7 +143,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSO
     format Fireplaces best12. ;
     format FireplaceQu $2. ;
     format GarageType $7. ;
-    format GarageYrBlt $4. ;
+    format GarageYrBlt best12. ;
     format GarageFinish $3. ;
     format GarageCars best12. ;
     format GarageArea best12. ;
@@ -225,7 +225,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSO
              Fireplaces
              FireplaceQu  $
              GarageType  $
-             GarageYrBlt $
+             GarageYrBlt 
              GarageFinish  $
              GarageCars
              GarageArea
@@ -385,7 +385,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
     informat Id best32. ;
     informat MSSubClass $3. ;
     informat MSZoning $2. ;
-    informat LotFrontage $2. ;
+    informat LotFrontage best32. ;
     informat LotArea best32. ;
     informat Street $4. ;
     informat Alley $2. ;
@@ -441,7 +441,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
     informat Fireplaces best32. ;
     informat FireplaceQu $2. ;
     informat GarageType $7. ;
-    informat GarageYrBlt $4. ;
+    informat GarageYrBlt best32. ;
     informat GarageFinish $3. ;
     informat GarageCars best32. ;
     informat GarageArea best32. ;
@@ -465,7 +465,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
     format Id best12. ;
    format MSSubClass $3. ;
    format MSZoning $2. ;
-   format LotFrontage $2. ;
+   format LotFrontage best12. ;
    format LotArea best12. ;
    format Street $4. ;
    format Alley $2. ;
@@ -521,7 +521,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
     format Fireplaces best12. ;
     format FireplaceQu $2. ;
     format GarageType $7. ;
-    format GarageYrBlt $4. ;
+    format GarageYrBlt best12. ;
     format GarageFinish $3. ;
     format GarageCars best12. ;
     format GarageArea best12. ;
@@ -546,7 +546,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
               Id
               MSSubClass $
               MSZoning  $
-              LotFrontage  $
+              LotFrontage 
               LotArea
               Street  $
               Alley  $
@@ -602,7 +602,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
              Fireplaces
              FireplaceQu  $
              GarageType  $
-             GarageYrBlt $
+             GarageYrBlt 
              GarageFinish  $
              GarageCars
              GarageArea
@@ -649,16 +649,16 @@ run;
 ods graphics on;
 title "Stepwise Multiple Linear Regression - All vars No Ints";
 proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_allvars_sel;
-	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
-/ param = ref;  
+	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	SaleType	SaleCondition
+		/ param = ref;  
 	model SalePrice_l =  MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
-LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
- @2 / selection = stepwise(choose = cv select = sl)  
-                stats     = press 
-                cvMethod  = split(5) 
-                cvDetails = all 
-                hierarchy = single;
-       output out=outData_step_allvars predicted = pred_step_allvars_l;
+		LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
+  		/ selection = stepwise(choose = cv select = sl)  
+        stats     = press 
+        cvMethod  = split(5) 
+        cvDetails = all 
+        hierarchy = single;
+	output out=outData_step_allvars predicted = pred_step_allvars_l;
 run; 
 
 proc reg data = step_allvars_sel plots = all;
@@ -670,20 +670,21 @@ title;
 ods graphics off;
 
 ods graphics on;
-title "Stepwise Multiple Linear Regression - 12 Vars w Ints";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_sel;
-	class Neighborhood LotConfig BldgType HouseStyle / param = ref;  
-	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
-|GarageCars @2 / selection = stepwise(choose = cv select = sl)  
-                stats     = press 
-                cvMethod  = split(5) 
-                cvDetails = all 
-                hierarchy = single;
-       output out=outData_Step predicted = pred_step_l;
+title "Forward Multiple Linear Regression - All Vars No Ints";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = forw_allvars_sel;
+	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	SaleType	SaleCondition
+		/ param = ref;  
+	model SalePrice_l =  MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
+		LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
+	  	/ selection = forward(choose = cv select = sl)  
+		stats     = press 
+		cvMethod  = split(5) 
+		cvDetails = all 
+		hierarchy = single;
+	output out=outData_forw_allvars predicted = forw_allvars_step_l;
 run; 
 
-proc reg data = step_sel plots = all;
+proc reg data = forw_allvars_sel plots = all;
 	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
@@ -692,48 +693,50 @@ title;
 ods graphics off;
 
 ods graphics on;
-title "Forward Selection Multiple Linear Regression - 12 Vars w Ints";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = forw_sel;
-	class Neighborhood LotConfig BldgType HouseStyle / param = ref;    
-	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
-|GarageCars @2 / selection = forward(choose = cv select = sl)  
-                stats     = press 
-                cvMethod  = split(5) 
-                cvDetails = all 
-                hierarchy = single;
-       output out=outData_Forw predicted = pred_forw_l;
+title "Backward Selection Multiple Linear Regression - All Vars No Ints";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = back_allvars_sel;
+	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	SaleType	SaleCondition
+		/ param = ref;  
+	model SalePrice_l =  MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
+		LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
+  		/ selection = backward (choose = cv select = sl)  
+        stats     = press 
+        cvMethod  = split(5) 
+        cvDetails = all 
+        hierarchy = single;
+	output out=outData_back_allvars predicted = pred_back_allvars_l;
 run; 
 
-proc reg data = forw_sel plots = all;
+proc reg data = back_allvars_sel plots = all;
 	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
 
 title;
 ods graphics off;
+
 
 ods graphics on;
-title "Backward Selection Multiple Linear Regression - 12 Vars w Ints";
-proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = back_sel;
-	class Neighborhood LotConfig BldgType HouseStyle / param = ref;    
-	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
-|GarageCars @2 / selection = backward(choose = cv select = sl)  
-                stats     = press 
-                cvMethod  = split(5) 
-                cvDetails = all 
-                hierarchy = single;
-       output out=outData_Back predicted = pred_back_l;
+title "Stepwise Selection Multiple Linear Regression - Most Promising Previously Selected Vars + Interactions";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_topvarsints_sel;
+	class MSSubClass Neighborhood RoofMatl Condition2 MSZoning SaleCondition CentralAir KitchenQual/ param = ref;    
+	model SalePrice_l =  MSSubClass|Neighborhood|YearBuilt|RoofMatl|BsmtFinSF1|GrLivArea|OverallQual|OverallCond|Condition2|MSZoning|GarageCars|TotalBsmtSF|SaleCondition|LotArea|CentralAir|KitchenQual|ScreenPorch
+		@2 / selection = stepwise (choose = cv select = sl)  
+        stats     = press 
+        cvMethod  = split(5) 
+        cvDetails = all 
+        hierarchy = single;
+	output out=outData_step_topvarsints predicted = pred_step_topvarsints_l;
 run; 
 
-proc reg data = back_sel plots = all;
+proc reg data = step_topvarsints_sel plots = all;
 	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
 
 title;
 ods graphics off;
+
 
 /* Macro to loop through creating each of the the three submission files */
 %macro create_submissions (method);
@@ -763,7 +766,7 @@ ods graphics off;
 	
 	%put &tmp_median_SalePrice.;
 	
-	data &method._test_submission;
+	data &method._submission;
 	set &method._test_stage2;
 	
 	if SalePrice = . then do;
@@ -772,14 +775,14 @@ ods graphics off;
 	
 	run;
 	
-	proc export data = &method._test_submission
-		outfile="/home/eric.balke/sasuser.v94/CaseStudy2/&method._test_submission.csv"
+	proc export data = &method._submission
+		outfile="/home/eric.balke/sasuser.v94/CaseStudy2/&method._submission.csv"
 		dbms=csv
 		replace;
 	run;
 %mend create_submissions;
 
-%create_submissions(method = step);
-%create_submissions(method = forw);
-%create_submissions(method = back);
 %create_submissions(method = step_allvars);
+%create_submissions(method = forw_allvars);
+%create_submissions(method = back_allvars);
+%create_submissions(method = step_topvarsints);
