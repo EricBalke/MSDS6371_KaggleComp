@@ -4,9 +4,9 @@ data train;
 %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
 infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
     informat Id best32. ;
-    informat MSSubClass best32. ;
+    informat MSSubClass $3. ;
     informat MSZoning $2. ;
-    informat LotFrontage $2. ;
+    informat LotFrontage best32. ;
     informat LotArea best32. ;
     informat Street $4. ;
     informat Alley $2. ;
@@ -85,9 +85,9 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSO
     informat SaleCondition $7. ;
     informat SalePrice best32. ;
     format Id best12. ;
-   format MSSubClass best12. ;
+   format MSSubClass $3. ;
    format MSZoning $2. ;
-   format LotFrontage $2. ;
+   format LotFrontage best12. ;
    format LotArea best12. ;
    format Street $4. ;
    format Alley $2. ;
@@ -167,9 +167,9 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSO
      format SalePrice best12. ;
   input
               Id
-              MSSubClass
+              MSSubClass $
               MSZoning  $
-              LotFrontage  $
+              LotFrontage  
               LotArea
               Street  $
               Alley  $
@@ -383,7 +383,7 @@ data test;
 %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
 infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
     informat Id best32. ;
-    informat MSSubClass best32. ;
+    informat MSSubClass $3. ;
     informat MSZoning $2. ;
     informat LotFrontage $2. ;
     informat LotArea best32. ;
@@ -463,7 +463,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
     informat SaleType $3. ;
     informat SaleCondition $7. ;
     format Id best12. ;
-   format MSSubClass best12. ;
+   format MSSubClass $3. ;
    format MSZoning $2. ;
    format LotFrontage $2. ;
    format LotArea best12. ;
@@ -544,7 +544,7 @@ infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOV
      format SaleCondition $7. ;
   input
               Id
-              MSSubClass
+              MSSubClass $
               MSZoning  $
               LotFrontage  $
               LotArea
@@ -647,11 +647,34 @@ GrLIvArea_l = log(GrLIvArea);
 run;
 
 ods graphics on;
-title "Stepwise Multiple Linear Regression";
+title "Stepwise Multiple Linear Regression - All vars No Ints";
+proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_allvars_sel;
+	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
+/ param = ref;  
+	model SalePrice_l =  MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
+LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
+ @2 / selection = stepwise(choose = cv select = sl)  
+                stats     = press 
+                cvMethod  = split(5) 
+                cvDetails = all 
+                hierarchy = single;
+       output out=outData_step_allvars predicted = pred_step_allvars_l;
+run; 
+
+proc reg data = step_allvars_sel plots = all;
+	model SalePrice_l = &_GLSMOD.;
+	ID id;
+run;
+
+title;
+ods graphics off;
+
+ods graphics on;
+title "Stepwise Multiple Linear Regression - 12 Vars w Ints";
 proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_sel;
-	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	class Neighborhood LotConfig BldgType HouseStyle / param = ref;  
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
 |GarageCars @2 / selection = stepwise(choose = cv select = sl)  
                 stats     = press 
                 cvMethod  = split(5) 
@@ -669,11 +692,11 @@ title;
 ods graphics off;
 
 ods graphics on;
-title "Forward Selection Multiple Linear Regression";
+title "Forward Selection Multiple Linear Regression - 12 Vars w Ints";
 proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = forw_sel;
-	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	class Neighborhood LotConfig BldgType HouseStyle / param = ref;    
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
 |GarageCars @2 / selection = forward(choose = cv select = sl)  
                 stats     = press 
                 cvMethod  = split(5) 
@@ -691,11 +714,11 @@ title;
 ods graphics off;
 
 ods graphics on;
-title "Backward Selection Multiple Linear Regression";
+title "Backward Selection Multiple Linear Regression - 12 Vars w Ints";
 proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = back_sel;
-	class LotConfig (param = ref) BldgType (param = ref) HouseStyle (param = ref);  
+	class Neighborhood LotConfig BldgType HouseStyle / param = ref;    
 	model SalePrice_l =  GrLIvArea_l | LotArea | OverallCond | YearBuilt | MasVnrArea 
-			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle
+			|TotalBsmtSF | FullBath | Fireplaces | LotConfig | BldgType | HouseStyle | Neighborhood
 |GarageCars @2 / selection = backward(choose = cv select = sl)  
                 stats     = press 
                 cvMethod  = split(5) 
@@ -759,4 +782,4 @@ ods graphics off;
 %create_submissions(method = step);
 %create_submissions(method = forw);
 %create_submissions(method = back);
-
+%create_submissions(method = step_allvars);
