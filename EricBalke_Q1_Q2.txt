@@ -1,3 +1,5 @@
+options mlogic symbolgen;
+
 data train;
 %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
 infile '/home/eric.balke/sasuser.v94/CaseStudy2/train.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
@@ -255,7 +257,7 @@ run;
 proc print data = train (obs = 10);
 run;
 
-/* Limit to the three neighborhoods */
+
 data train_1;
 set train;
 
@@ -263,7 +265,6 @@ where Neighborhood in ("NAmes","Edwards","BrkSide");
 
 run;
 
-/* Create dummy variables for the Neighborhoods */
 data train_2;
 set train_1;
 
@@ -288,7 +289,7 @@ run;
 ods graphics on;
 title "Linear-Linear MLR with Dummy and Interactions with Influential Point 1299";
 proc reg data = train_2 plots = all;
-	model SalePrice = GrLIvArea E_Dummy N_Dummy int_e int_n/CLM R  CLB VIF;
+	model SalePrice = GrLIvArea E_Dummy N_Dummy int_e int_n;
 	ID id;
 run;
 quit;
@@ -305,7 +306,7 @@ run;
 ods graphics on;
 title "Linear-Linear MLR with Dummy and Interactions w/o Influential Point 1299";
 proc reg data = train_3 plots = all;
-	model SalePrice = GrLIvArea E_Dummy N_Dummy int_e int_n/CLM R  CLB VIF;
+	model SalePrice = GrLIvArea E_Dummy N_Dummy int_e int_n;
 	ID id;
 run;
 quit;
@@ -325,7 +326,7 @@ run;
 ods graphics on;
 title "Log-Linear MLR with Dummy and Interactions";
 proc reg data = train_4 plots = all;
-	model SalePrice_l = GrLIvArea E_Dummy N_Dummy int_e int_n/CLM R  CLB VIF;
+	model SalePrice_l = GrLIvArea E_Dummy N_Dummy int_e int_n;
 	ID id;
 run;
 quit;
@@ -335,7 +336,7 @@ ods graphics off;
 ods graphics on;
 title "Linear-Log MLR with Dummy and Interactions";
 proc reg data = train_4 plots = all;
-	model SalePrice = GrLIvArea_l E_Dummy N_Dummy int_e_l int_n_l/CLM R  CLB VIF;
+	model SalePrice = GrLIvArea_l E_Dummy N_Dummy int_e_l int_n_l;
 	ID id;
 run;
 quit;
@@ -345,7 +346,7 @@ ods graphics off;
 ods graphics on;
 title "Log-Log MLR with Dummy and Interactions";
 proc reg data = train_4 plots = all;
-	model SalePrice_l = GrLIvArea_l E_Dummy N_Dummy int_e_l int_n_l/CLM R  CLB VIF;
+	model SalePrice_l = GrLIvArea_l E_Dummy N_Dummy int_e_l int_n_l;
 	ID id;
 run;
 quit;
@@ -367,7 +368,7 @@ run;
 ods graphics on;
 title "Log-Log MLR with Dummy and Centered Interactions";
 proc reg data = train_5 plots = all;
-	model SalePrice_l = GrLIvArea_l E_Dummy N_Dummy centE centN/CLM R  CLB VIF;
+	model SalePrice_l = GrLIvArea_l E_Dummy N_Dummy centE centN;
 	ID id;
 run;
 quit;
@@ -377,6 +378,266 @@ ods graphics off;
 /*****************/
 /* Start Q2 Here */
 /*****************/
+/* Import the test data */
+data test;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile '/home/eric.balke/sasuser.v94/CaseStudy2/test.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+    informat Id best32. ;
+    informat MSSubClass best32. ;
+    informat MSZoning $2. ;
+    informat LotFrontage $2. ;
+    informat LotArea best32. ;
+    informat Street $4. ;
+    informat Alley $2. ;
+    informat LotShape $3. ;
+    informat LandContour $3. ;
+    informat Utilities $6. ;
+    informat LotConfig $7. ;
+    informat LandSlope $3. ;
+    informat Neighborhood $7. ;
+    informat Condition1 $6. ;
+    informat Condition2 $6.;
+    informat BldgType $6. ;
+    informat HouseStyle $6. ;
+    informat OverallQual best32. ;
+    informat OverallCond best32. ;
+    informat YearBuilt best32. ;
+    informat YearRemodAdd best32. ;
+    informat RoofStyle $5. ;
+    informat RoofMatl $7. ;
+    informat Exterior1st $7. ;
+    informat Exterior2nd $7. ;
+    informat MasVnrType $7. ;
+    informat MasVnrArea best32. ;
+    informat ExterQual $2. ;
+    informat ExterCond $2. ;
+    informat Foundation $6. ;
+    informat BsmtQual $2. ;
+    informat BsmtCond $2. ;
+    informat BsmtExposure $2. ;
+    informat BsmtFinType1 $3. ;
+    informat BsmtFinSF1 best32. ;
+    informat BsmtFinType2 $3. ;
+    informat BsmtFinSF2 best32. ;
+    informat BsmtUnfSF best32. ;
+    informat TotalBsmtSF best32. ;
+    informat Heating $4. ;
+    informat HeatingQC $2. ;
+    informat CentralAir $1. ;
+    informat Electrical $5. ;
+    informat "1stFlrSF"N best32. ;
+    informat "2ndFlrSF"N best32. ;
+    informat LowQualFinSF best32. ;
+    informat GrLivArea best32. ;
+    informat BsmtFullBath best32. ;
+    informat BsmtHalfBath best32. ;
+    informat FullBath best32. ;
+    informat HalfBath best32. ;
+    informat BedroomAbvGr best32. ;
+    informat KitchenAbvGr best32. ;
+    informat KitchenQual $2. ;
+    informat TotRmsAbvGrd best32. ;
+    informat Functional $4. ;
+    informat Fireplaces best32. ;
+    informat FireplaceQu $2. ;
+    informat GarageType $7. ;
+    informat GarageYrBlt $4. ;
+    informat GarageFinish $3. ;
+    informat GarageCars best32. ;
+    informat GarageArea best32. ;
+    informat GarageQual $2. ;
+    informat GarageCond $2. ;
+    informat PavedDrive $1. ;
+    informat WoodDeckSF best32. ;
+    informat OpenPorchSF best32. ;
+    informat EnclosedPorch best32. ;
+    informat "3SsnPorch"N best32. ;
+    informat ScreenPorch best32. ;
+    informat PoolArea best32. ;
+    informat PoolQC $2. ;
+    informat Fence $5. ;
+    informat MiscFeature $4. ;
+    informat MiscVal best32. ;
+    informat MoSold best32. ;
+    informat YrSold best32. ;
+    informat SaleType $3. ;
+    informat SaleCondition $7. ;
+    format Id best12. ;
+   format MSSubClass best12. ;
+   format MSZoning $2. ;
+   format LotFrontage $2. ;
+   format LotArea best12. ;
+   format Street $4. ;
+   format Alley $2. ;
+   format LotShape $3. ;
+   format LandContour $3. ;
+   format Utilities $6. ;
+   format LotConfig $7. ;
+   format LandSlope $3. ;
+   format Neighborhood $7. ;
+   format Condition1 $6. ;
+   format Condition2 $6. ;
+   format BldgType $6. ;
+   format HouseStyle $6. ;
+   format OverallQual best12. ;
+   format OverallCond best12. ;
+   format YearBuilt best12. ;
+   format YearRemodAdd best12. ;
+   format RoofStyle $5. ;
+   format RoofMatl $7. ;
+   format Exterior1st $7. ;
+   format Exterior2nd $7. ;
+   format MasVnrType $7. ;
+   format MasVnrArea best12. ;
+   format ExterQual $2. ;
+   format ExterCond $2. ;
+   format Foundation $6. ;
+   format BsmtQual $2. ;
+   format BsmtCond $2. ;
+    format BsmtExposure $2. ;
+    format BsmtFinType1 $3. ;
+    format BsmtFinSF1 best12. ;
+    format BsmtFinType2 $3. ;
+    format BsmtFinSF2 best12. ;
+    format BsmtUnfSF best12. ;
+    format TotalBsmtSF best12. ;
+    format Heating $4. ;
+    format HeatingQC $2. ;
+    format CentralAir $1. ;
+    format Electrical $5. ;
+    format "1stFlrSF"N best12. ;
+    format "2ndFlrSF"N best12. ;
+    format LowQualFinSF best12. ;
+    format GrLivArea best12. ;
+    format BsmtFullBath best12. ;
+    format BsmtHalfBath best12. ;
+    format FullBath best12. ;
+    format HalfBath best12. ;
+    format BedroomAbvGr best12. ;
+    format KitchenAbvGr best12. ;
+    format KitchenQual $2. ;
+    format TotRmsAbvGrd best12. ;
+    format Functional $4. ;
+    format Fireplaces best12. ;
+    format FireplaceQu $2. ;
+    format GarageType $7. ;
+    format GarageYrBlt $4. ;
+    format GarageFinish $3. ;
+    format GarageCars best12. ;
+    format GarageArea best12. ;
+    format GarageQual $2. ;
+     format GarageCond $2. ;
+     format PavedDrive $1. ;
+     format WoodDeckSF best12. ;
+     format OpenPorchSF best12. ;
+     format EnclosedPorch best12. ;
+     format "3SsnPorch"N best12. ;
+     format ScreenPorch best12. ;
+     format PoolArea best12. ;
+     format PoolQC $2. ;
+     format Fence $5. ;
+     format MiscFeature $4. ;
+     format MiscVal best12. ;
+     format MoSold best12. ;
+     format YrSold best12. ;
+     format SaleType $3. ;
+     format SaleCondition $7. ;
+  input
+              Id
+              MSSubClass
+              MSZoning  $
+              LotFrontage  $
+              LotArea
+              Street  $
+              Alley  $
+              LotShape  $
+              LandContour  $
+              Utilities  $
+              LotConfig  $
+              LandSlope  $
+              Neighborhood  $
+              Condition1  $
+              Condition2  $
+              BldgType  $
+              HouseStyle  $
+              OverallQual
+              OverallCond
+              YearBuilt
+              YearRemodAdd
+              RoofStyle  $
+              RoofMatl  $
+              Exterior1st  $
+              Exterior2nd  $
+              MasVnrType  $
+              MasVnrArea
+              ExterQual  $
+              ExterCond  $
+              Foundation  $
+              BsmtQual  $
+              BsmtCond  $
+              BsmtExposure  $
+              BsmtFinType1  $
+              BsmtFinSF1
+              BsmtFinType2  $
+              BsmtFinSF2
+              BsmtUnfSF
+              TotalBsmtSF
+              Heating  $
+              HeatingQC  $
+              CentralAir  $
+              Electrical  $
+              "1stFlrSF"N
+              "2ndFlrSF"N
+              LowQualFinSF
+              GrLivArea
+              BsmtFullBath
+              BsmtHalfBath
+              FullBath
+             HalfBath
+             BedroomAbvGr
+             KitchenAbvGr
+             KitchenQual  $
+             TotRmsAbvGrd
+             Functional  $
+             Fireplaces
+             FireplaceQu  $
+             GarageType  $
+             GarageYrBlt $
+             GarageFinish  $
+             GarageCars
+             GarageArea
+             GarageQual  $
+             GarageCond  $
+             PavedDrive  $
+             WoodDeckSF
+             OpenPorchSF
+             EnclosedPorch
+             "3SsnPorch"N
+             ScreenPorch
+             PoolArea
+             PoolQC  $
+             Fence  $
+             MiscFeature  $
+             MiscVal
+             MoSold
+             YrSold
+             SaleType  $
+             SaleCondition  $
+;
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+/* Stack the test and train datasets so the GLMSELECTS can learn the coefficients */
+/* with the train data and predict the value of the log of the sale price with the test data */
+proc append data = test base = train force;
+run;
+
+proc contents data = train;
+run;
+
+proc print data = train (obs = 10);
+run;
+
 data train_6;
 set train;
 
@@ -396,11 +657,11 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outd
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData_Step;
+       output out=outData_Step predicted = pred_step_l;
 run; 
 
 proc reg data = step_sel plots = all;
-	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
 
@@ -418,11 +679,11 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outd
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData_Forw;
+       output out=outData_Forw predicted = pred_forw_l;
 run; 
 
 proc reg data = forw_sel plots = all;
-	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
 
@@ -440,13 +701,62 @@ proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outd
                 cvMethod  = split(5) 
                 cvDetails = all 
                 hierarchy = single;
-       output out=outData_Back;
+       output out=outData_Back predicted = pred_back_l;
 run; 
 
 proc reg data = back_sel plots = all;
-	model SalePrice_l = &_GLSMOD./ CLM R CLB VIF;
+	model SalePrice_l = &_GLSMOD.;
 	ID id;
 run;
 
 title;
 ods graphics off;
+
+/* Macro to loop through creating each of the the three submission files */
+%macro create_submissions (method);
+	data &method._test_stage1;
+	set outData_&method.;
+	
+		if Id ge 1461;
+		
+		SalePrice = exp(pred_&method._l);
+	
+	run;
+	
+	data &method._test_stage2 (keep = Id SalePrice);
+	set &method._test_stage1;
+	run;
+	
+	/* Routine to impute median value when predicted value is missing */
+	proc means data = &method._test_stage2 median;
+		var SalePrice;
+		output out=tmp_median_SalePrice median=tmp_median_SalePrice;
+	run;
+	
+	data _null_;
+		set tmp_median_SalePrice;
+		call symputx('tmp_median_SalePrice', tmp_median_SalePrice);
+	run;
+	
+	%put &tmp_median_SalePrice.;
+	
+	data &method._test_submission;
+	set &method._test_stage2;
+	
+	if SalePrice = . then do;
+		SalePrice = input(&tmp_median_SalePrice.,11.2);
+	end;
+	
+	run;
+	
+	proc export data = &method._test_submission
+		outfile="/home/eric.balke/sasuser.v94/CaseStudy2/&method._test_submission.csv"
+		dbms=csv
+		replace;
+	run;
+%mend create_submissions;
+
+%create_submissions(method = step);
+%create_submissions(method = forw);
+%create_submissions(method = back);
+
