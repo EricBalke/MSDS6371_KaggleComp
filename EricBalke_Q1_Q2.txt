@@ -257,6 +257,36 @@ run;
 proc print data = train (obs = 10);
 run;
 
+/* Begin testing the selected variables in the top performing MLR model for missing vars 
+/* for imputation methods */
+proc freq data = train;
+tables MSSubClass Neighborhood RoofMatl / missing list;
+run;
+
+proc means data = train nmiss;
+var YearBuilt BsmtFinSF1 GrLivArea OverallQual OverallCond;
+run;
+
+proc mi data=train seed=1518971 simple;
+   em itprint outem=outem;
+   var LotFrontage GarageYrBlt;
+run;
+
+data train_mi;
+set train;
+
+if LotFrontage = . then do;
+	LotFrontage = 70;
+end;
+if GarageYrBlt = . then do;
+	GarageYrBlt = 1978;
+end;
+
+SalePrice_l = log(SalePrice);
+GrLIvArea_l = log(GrLIvArea);
+
+run;
+
 
 data train_1;
 set train;
@@ -631,6 +661,8 @@ run;
 /* with the train data and predict the value of the log of the sale price with the test data */
 proc append data = test base = train force;
 run;
+proc append data = test base = train_mi force;
+run;
 
 proc contents data = train;
 run;
@@ -715,7 +747,7 @@ run;
 title;
 ods graphics off;
 
-
+/* Comment this out due to time to run
 ods graphics on;
 title "Stepwise Selection Multiple Linear Regression - Most Promising Previously Selected Vars + Interactions";
 proc glmselect data=train_6 plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_topvarsints_sel;
@@ -736,7 +768,31 @@ run;
 
 title;
 ods graphics off;
+*/
 
+
+ods graphics on;
+title "Stepwise Multiple Linear Regression - All vars No Ints with Multiple Imputation";
+proc glmselect data=train_mi plots(stepAxis=number)=(criterionPanel ASEPlot) outdesign (addinputvars) = step_allvarsmi_sel;
+	class MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	SaleType	SaleCondition
+		/ param = ref;  
+	model SalePrice_l =  MSZoning	MSSubClass	Street	Alley	LotShape	LandContour	Utilities	LotConfig	LandSlope	Neighborhood	Condition1	Condition2	BldgType	HouseStyle	YearBuilt	YearRemodAdd	RoofStyle	RoofMatl	Exterior1st	Exterior2nd	MasVnrType	ExterQual	ExterCond	Foundation	BsmtQual	BsmtCond	BsmtExposure	BsmtFinType1	BsmtFinType2	Heating	HeatingQC	CentralAir	Electrical	KitchenQual	Functional	FireplaceQu	GarageType	GarageYrBlt	GarageFinish	GarageQual	GarageCond	PavedDrive	PoolQC	Fence	MiscFeature	YrSold	SaleType	SaleCondition
+		LotFrontage	LotArea	MasVnrArea	BsmtFinSF1	BsmtFinSF2	BsmtUnfSF	TotalBsmtSF	"1stFlrSF"n	"2ndFlrSF"n	LowQualFinSF	GrLivArea	BsmtFullBath	BsmtHalfBath	FullBath	HalfBath	BedroomAbvGr	KitchenAbvGr	TotRmsAbvGrd	Fireplaces	GarageCars	GarageArea	WoodDeckSF	OpenPorchSF	EnclosedPorch	"3SsnPorch"n	ScreenPorch	PoolArea	MiscVal	MoSold	OverallQual	OverallCond
+  		/ selection = stepwise(choose = cv select = sl)  
+        stats     = press 
+        cvMethod  = split(5) 
+        cvDetails = all 
+        hierarchy = single;
+	output out=outData_step_allvarsmi predicted = pred_step_allvarsmi_l;
+run; 
+
+proc reg data = step_allvarsmi_sel plots = all;
+	model SalePrice_l = &_GLSMOD.;
+	ID id;
+run;
+
+title;
+ods graphics off;
 
 /* Macro to loop through creating each of the the three submission files */
 %macro create_submissions (method);
@@ -785,4 +841,5 @@ ods graphics off;
 %create_submissions(method = step_allvars);
 %create_submissions(method = forw_allvars);
 %create_submissions(method = back_allvars);
-%create_submissions(method = step_topvarsints);
+*%create_submissions(method = step_topvarsints);
+%create_submissions(method = step_allvarsmi);
